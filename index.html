@@ -597,9 +597,9 @@ tr:last-child td { border-bottom: 0; }
   const RPC_URL = 'https://mainnet.base.org';
   const FIELDS = [
     { name: 'The Iron Citadel', kanji: '鉄城', numeral: '一' },
-    { name: 'The Breaker Pass', kanji: '雪峡', numeral: '二' },
-    { name: 'The Silent Monastery', kanji: '静寺', numeral: '三' },
-    { name: 'The Drowned Fishing Village', kanji: '沈漁村', numeral: '四' },
+    { name: 'The Frozen Pass', kanji: '雪峡', numeral: '二' },
+    { name: 'The Bamboo Temple', kanji: '静寺', numeral: '三' },
+    { name: 'The Fishing Village', kanji: '沈漁村', numeral: '四' },
     { name: 'The Ashen Wastes', kanji: '灰荒野', numeral: '五' }
   ];
   const ABI = [
@@ -819,6 +819,36 @@ tr:last-child td { border-bottom: 0; }
     FIELDS.forEach((f,i)=>{
       const c=document.createElement('article');c.className='card';c.setAttribute('aria-label','Battlefield '+(i+1)+', '+f.name);
       c.innerHTML='<div class="card-art"><div class="art-ph" lang="ja"><span>'+f.kanji+'</span><small>Battlefield '+(i+1)+'</small></div><div class="card-num" lang="ja">'+f.numeral+'</div><div class="card-state"></div><div class="clash"><div class="bid h"></div><div class="vs">対</div><div class="bid c"></div></div><div class="vrf-badge" hidden></div><div class="card-title"><h3>'+f.name+'</h3><span class="kanji" lang="ja">'+f.kanji+'</span></div></div><div class="card-body"><div class="amount"><div><span class="amt-num">0</span><span class="amt-unit">credits</span></div><div class="after"></div></div><input class="slider" type="range" min="0" max="100" step="1" value="0" aria-label="Credits to commit at '+f.name+'"><button type="button" class="commit">Commit Army</button><p class="card-note"></p></div>';
+	  // Load the battlefield image from the images folder.
+		const art = $('.card-art', c);
+		const img = document.createElement('img');
+
+		img.className = 'art-img';
+		img.alt = f.name;
+		img.loading = 'lazy';
+
+		const extensions = ['png', 'webp', 'jpg', 'gif'];
+		let extensionIndex = 0;
+
+		function tryNextImage() {
+		  if (extensionIndex >= extensions.length) {
+			console.warn('Battlefield image not found:', f.name);
+			img.remove();
+			return;
+		  }
+
+		  img.src = 'images/battlefield-' + (i + 1) + '.' +
+			extensions[extensionIndex++];
+		}
+
+		img.addEventListener('load', () => {
+		  art.classList.add('has-img');
+		});
+
+		img.addEventListener('error', tryNextImage);
+
+		art.prepend(img);
+		tryNextImage();
       board.appendChild(c);const r={root:c,state:$('.card-state',c),bh:$('.clash .bid.h',c),bc:$('.clash .bid.c',c),vrf:$('.vrf-badge',c),num:$('.amt-num',c),after:$('.after',c),slider:$('.slider',c),btn:$('.commit',c),note:$('.card-note',c)};
       r.slider.addEventListener('input',()=>{
         const value=Number(r.slider.value), max=Math.max(1,Number(r.slider.max));
