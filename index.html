@@ -188,12 +188,13 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 .after { color: var(--muted); font-size: 0.82rem; text-align: right; line-height: 1.3; }
 .after b { color: var(--paper); font-variant-numeric: tabular-nums; }
 
-.slider { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; margin: 0; --pct: 0%; }
-.slider::-webkit-slider-runnable-track { height: 6px; background: linear-gradient(90deg, var(--side) var(--pct), #2a252b var(--pct)); border-radius: 3px; }
-.slider::-moz-range-track { height: 6px; background: #2a252b; border-radius: 3px; }
-.slider::-moz-range-progress { height: 6px; background: var(--side); border-radius: 3px; }
-.slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -8px; background: linear-gradient(#f3d27a, #b98322); border: 2px solid #1a1205; transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 0 1px var(--gold-hi), 0 2px 8px #000; }
-.slider::-moz-range-thumb { width: 18px; height: 18px; background: linear-gradient(#f3d27a, #b98322); border: 2px solid #1a1205; transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 0 1px var(--gold-hi); }
+.slider { -webkit-appearance: none; appearance: none; width: 100%; height: 36px; background: transparent; margin: 0; --pct: 0%; cursor: grab; touch-action: pan-y; user-select: none; }
+.slider:active { cursor: grabbing; }
+.slider::-webkit-slider-runnable-track { height: 5px; background: linear-gradient(90deg, var(--side) var(--pct), #2a252b var(--pct)); border-radius: 999px; }
+.slider::-moz-range-track { height: 5px; background: #2a252b; border-radius: 999px; }
+.slider::-moz-range-progress { height: 5px; background: var(--side); border-radius: 999px; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -7.5px; background: linear-gradient(#f3d27a, #b98322); border: 2px solid #1a1205; border-radius: 50%; box-shadow: 0 0 0 1px var(--gold-hi), 0 2px 8px #000; }
+.slider::-moz-range-thumb { width: 20px; height: 20px; background: linear-gradient(#f3d27a, #b98322); border: 2px solid #1a1205; border-radius: 50%; box-shadow: 0 0 0 1px var(--gold-hi); }
 .slider:disabled { opacity: 0.35; cursor: not-allowed; }
 .slider:focus-visible { outline-offset: 0; border-radius: 4px; }
 
@@ -205,6 +206,15 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 .commit.reveal:hover:not(:disabled) { background: #d9a93f22; filter: none; }
 .card-note { margin: 0; font-size: 0.8rem; color: var(--muted); min-height: 1.2em; }
 .card-note code { word-break: break-all; }
+.match-ending { grid-column: 1 / -1; display: flex; align-items: center; gap: 18px; padding: 22px clamp(16px, 3vw, 32px); margin-bottom: 4px; border: 1px solid var(--line-strong); background: linear-gradient(105deg, #17110a, #090809 78%); }
+.match-ending .ending-mark { flex: 0 0 64px; width: 64px; height: 64px; display: grid; place-items: center; font-family: var(--serif); font-size: 2.2rem; font-weight: 800; border: 1px solid currentColor; }
+.match-ending strong { display: block; font-family: var(--serif); font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; letter-spacing: .04em; }
+.match-ending p { margin: 5px 0 0; color: #c7beaa; font-size: .9rem; }
+.ending-eyebrow { display: block; margin-bottom: 3px; font-size: .72rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
+.match-ending.victory { color: var(--gold-hi); border-color: #d9a93f99; box-shadow: inset 4px 0 var(--gold); }
+.match-ending.defeat { color: #ff8b7f; border-color: #ff6a5c88; box-shadow: inset 4px 0 #ff6a5c; }
+.match-ending.draw { color: var(--gold-hi); }
+@media (max-width: 560px) { .match-ending { align-items: flex-start; gap: 12px; padding: 16px; } .match-ending .ending-mark { flex-basis: 46px; width: 46px; height: 46px; font-size: 1.6rem; } }
 
 /* reveal clash overlay */
 .clash { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-items: center; background: radial-gradient(ellipse at 50% 42%, #0007 0%, #000a 100%); padding: 0 8px 46px; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
@@ -247,6 +257,16 @@ tr:last-child td { border-bottom: 0; }
 .btn-line { background: transparent; color: var(--gold-hi); }
 .btn-line:hover { background: #d9a93f22; }
 .match-row.yours { border-left-color: var(--gold); }
+.create-match-panel { margin: 16px 0 20px; padding: 18px 20px; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) auto; align-items: center; gap: 14px 22px; background: linear-gradient(120deg, #15110a, #0d0b0d 70%); border: 1px solid var(--line-strong); border-left: 3px solid var(--gold); }
+.stake-copy h3 { margin: 0 0 3px; color: var(--gold-hi); font-family: var(--serif); font-size: 1.15rem; }
+.stake-copy p { margin: 0; max-width: 58ch; color: var(--muted); font-size: .88rem; }
+.stake-field { display: grid; gap: 5px; color: var(--muted); font-size: .8rem; }
+.stake-input-wrap { display: flex; align-items: center; border: 1px solid var(--line-strong); background: #050505; }
+.stake-input-wrap .currency { padding: 0 10px; color: var(--gold); font-size: .78rem; font-weight: 800; border-right: 1px solid var(--line); }
+.stake-input-wrap input { width: 100%; min-width: 0; padding: 10px 12px; color: var(--paper); background: transparent; border: 0; outline: 0; font-variant-numeric: tabular-nums; }
+.stake-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--gold-hi); }
+.stake-footnote { grid-column: 1 / -1; margin: -4px 0 0; color: var(--muted); font-size: .78rem; }
+@media (max-width: 700px) { .create-match-panel { grid-template-columns: 1fr; gap: 12px; padding: 16px; } .stake-footnote { grid-column: auto; } }
 
 /* ---------- protocol ---------- */
 .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--gap); margin-bottom: 28px; }
@@ -380,6 +400,18 @@ tr:last-child td { border-bottom: 0; }
     <div class="section-head">
       <h2 id="lobbyTitle"><span lang="ja">陣営</span> Open matches</h2>
       <button type="button" class="btn-gold" id="createMatchBtn">Create open match</button>
+    </div>
+    <div class="create-match-panel" id="createMatchPanel">
+      <div class="stake-copy">
+        <h3>Set your stake</h3>
+        <p>Choose how much USDC each player puts in. The winner receives both stakes; cancelled matches are refundable.</p>
+      </div>
+      <label class="stake-field" for="stakeAmount">
+        <span>Stake per player</span>
+        <div class="stake-input-wrap"><span class="currency">USDC</span><input id="stakeAmount" type="number" inputmode="decimal" min="0.000001" max="1000000" step="0.01" value="1" placeholder="1.00"></div>
+      </label>
+      <button type="button" class="btn-gold" id="confirmCreateMatchBtn">Create match</button>
+      <p class="stake-footnote">You’ll approve USDC and confirm the transaction in your wallet. No popup prompt.</p>
     </div>
     <div class="lobby-list" id="lobbyList"></div>
     <p class="fine">Open matches shown here are read from the deployed contract on Base Mainnet. Only recent match IDs are scanned to keep RPC reads bounded.</p>
@@ -687,10 +719,13 @@ tr:last-child td { border-bottom: 0; }
   }
   async function createMatch() {
     requireWallet();
-    const raw=prompt('Stake per player in USDC (for example, 1 or 5). This locks real USDC in the contract.');
-    if (raw===null) return;
-    if (!/^\d+(\.\d{1,6})?$/.test(raw.trim()) || Number(raw)<=0) throw new Error('Enter a positive USDC amount with up to 6 decimal places.');
-    const stake=ethers.parseUnits(raw.trim(),state.decimals);
+    const field=$('#stakeAmount');
+    const raw=String(field?.value ?? '').trim();
+    if (!/^\d+(\.\d{1,6})?$/.test(raw) || Number(raw)<=0) {
+      field?.focus();
+      throw new Error('Enter a positive USDC amount with up to 6 decimal places.');
+    }
+    const stake=ethers.parseUnits(raw,state.decimals);
     if (state.balance < stake) throw new Error('Your wallet does not have enough USDC for this stake.');
     await ensureAllowance(stake);
     await txAction('Create match',()=>state.contract.createMatch(stake));
@@ -777,7 +812,7 @@ tr:last-child td { border-bottom: 0; }
       const c=document.createElement('article');c.className='card';c.setAttribute('aria-label','Battlefield '+(i+1)+', '+f.name);
       c.innerHTML='<div class="card-art"><div class="art-ph" lang="ja"><span>'+f.kanji+'</span><small>Battlefield '+(i+1)+'</small></div><div class="card-num" lang="ja">'+f.numeral+'</div><div class="card-state"></div><div class="clash"><div class="bid h"></div><div class="vs">対</div><div class="bid c"></div></div><div class="vrf-badge" hidden></div><div class="card-title"><h3>'+f.name+'</h3><span class="kanji" lang="ja">'+f.kanji+'</span></div></div><div class="card-body"><div class="amount"><div><span class="amt-num">0</span><span class="amt-unit">credits</span></div><div class="after"></div></div><input class="slider" type="range" min="0" max="100" step="1" value="0" aria-label="Credits to commit at '+f.name+'"><button type="button" class="commit">Commit Army</button><p class="card-note"></p></div>';
       board.appendChild(c);const r={root:c,state:$('.card-state',c),bh:$('.clash .bid.h',c),bc:$('.clash .bid.c',c),vrf:$('.vrf-badge',c),num:$('.amt-num',c),after:$('.after',c),slider:$('.slider',c),btn:$('.commit',c),note:$('.card-note',c)};
-      r.slider.addEventListener('input',()=>{state.selectedBids[i]=Number(r.slider.value);renderCard(i);});
+      r.slider.addEventListener('input',()=>{state.selectedBids[i]=Number(r.slider.value);r.slider.style.setProperty('--pct',(Number(r.slider.value)/Math.max(1,Number(r.slider.max))*100)+'%');renderCard(i);});
       r.btn.addEventListener('click',()=>{const m=state.match;if(!m)return;const p=Number(m.phase);(p===2?commitBid():p===3?revealBid():Promise.reject(new Error('This battlefield is not accepting actions.'))).catch(e=>toast(readError(e),true));});
       state.cards.push(r);
     });
@@ -799,7 +834,7 @@ tr:last-child td { border-bottom: 0; }
     if(phase===2) {
       const committed=m.commits[side]!==ethers.ZeroHash, oppCommitted=m.commits[1-side]!==ethers.ZeroHash;
       if(committed) {const secret=getSecret(state.matchId,Number(m.battle),state.address);r.num.textContent=secret?secret.amount:'Hidden';r.after.textContent='Secret saved in this browser';r.state.textContent='Your bid committed';r.btn.textContent='Committed';r.note.textContent='Your bid is hidden on-chain until both players commit.';}
-      else {const v=Math.min(credits,Number(state.selectedBids[i]||0));r.slider.disabled=false;r.slider.max=credits;r.slider.value=v;r.num.textContent=v;r.after.innerHTML='Left after bid<br><b>'+(credits-v)+'</b> of '+credits;r.state.textContent=oppCommitted?'Opponent committed':'Commit phase';r.btn.disabled=state.loading;r.btn.textContent=state.loading?'Waiting…':'Commit Army';r.note.textContent='The bid and salt are stored locally before the wallet transaction. Do not clear browser data before revealing.';}
+      else {const v=Math.min(credits,Number(state.selectedBids[i]||0));r.slider.disabled=false;r.slider.max=credits;r.slider.value=v;r.slider.style.setProperty('--pct',(v/Math.max(1,credits)*100)+'%');r.num.textContent=v;r.after.innerHTML='Left after bid<br><b>'+(credits-v)+'</b> of '+credits;r.state.textContent=oppCommitted?'Opponent committed':'Commit phase';r.btn.disabled=state.loading;r.btn.textContent=state.loading?'Waiting…':'Commit Army';r.note.textContent='The bid and salt are stored locally before the wallet transaction. Do not clear browser data before revealing.';}
     } else if(phase===3) {
       const revealed=Boolean(m.revealed[side]),secret=getSecret(state.matchId,Number(m.battle),state.address);r.num.textContent=secret?secret.amount:'Hidden';r.after.textContent='Both commitments are fixed';r.state.textContent=revealed?'Your bid revealed':'Reveal phase';r.btn.className='commit reveal';r.btn.disabled=revealed||!secret||state.loading;r.btn.textContent=revealed?'Revealed':!secret?'Reveal secret missing':'Reveal Army';r.note.textContent=revealed?'Waiting for the opponent to reveal.':!secret?'This browser has no saved salt for this commitment; it cannot be recovered from the contract.':'Reveal your saved bid. The contract verifies the exact commitment.';
     }
@@ -813,7 +848,23 @@ tr:last-child td { border-bottom: 0; }
     let action=''; if(phase===1&&side==='host') action='<button type="button" class="btn-line" id="cancelOpenBtn">Cancel open match</button>';
     if((phase===2||phase===3)&&deadline&&Date.now()/1000>deadline) action+='<button type="button" class="btn-gold" id="timeoutBtn">Claim timeout</button>';
     if(phase===4&&Number(m.outcome)===3) action+='<span>Cancelled · refund claimable</span>';
-    $('#hud').innerHTML=player('host',0,host)+'<div class="hud-mid"><div class="score"><span class="sh">'+Number(m.score[0])+'</span><span class="sep">対</span><span class="sc">'+Number(m.score[1])+'</span></div><div class="goal">First to 3 battlefields</div><div class="pips">'+pips+'</div><div class="phase"><span class="phase-name">'+(phase===1?'Open match':phase===4?'Match over':'Battle '+(Number(m.battle)+1)+' of 5')+'</span><span>'+esc(battleStatus(m))+'</span></div>'+(phase===2||phase===3?'<div class="phase"><span>Deadline</span><span class="phase-clock '+(seconds<3600?'urgent':'')+'">'+formatClock(seconds)+'</span></div>':'')+'<div class="phase"><span>Stake per player</span><span>'+esc(formatUSDC(m.stake))+'</span></div>'+action+'</div>'+player('chal',1,chal);
+    let ending='';
+    if(phase===4) {
+      const outcome=Number(m.outcome), winner=String(m.winner||'').toLowerCase();
+      if(outcome===3 || !winner || winner==='0x0000000000000000000000000000000000000000') {
+        ending='<div class="match-ending draw"><div class="ending-mark">返</div><div><strong>Match cancelled</strong><p>Your stake is credited back to you. Withdraw it from your claimable balance.</p></div></div>';
+      } else {
+        const won=!!state.address && winner===state.address.toLowerCase();
+        const isPlayer=!!state.address && m.players.some(p=>p.toLowerCase()===state.address.toLowerCase());
+        const title=won?'VICTORY — YOU WON':isPlayer?'DEFEAT — YOU LOST':'MATCH COMPLETE';
+        const reason=outcome===2?'The match was decided by a missed deadline.':'First to three battlefields wins.';
+        const tone=won?'victory':isPlayer?'defeat':'draw';
+        const mark=won?'勝':isPlayer?'敗':'龍';
+        const detail=won?'Your winnings are credited to your claimable USDC balance.':isPlayer?'The opponent won this match. Your stake went to the winner.':'Winner: '+short(m.winner)+'. Connect as a player to see your personal result.';
+        ending='<div class="match-ending '+tone+'"><div class="ending-mark">'+mark+'</div><div><span class="ending-eyebrow">'+(won?'Five Dragons · Victory':isPlayer?'Five Dragons · Defeat':'Five Dragons · Final result')+'</span><strong>'+title+'</strong><p>'+reason+' '+detail+'</p></div></div>';
+      }
+    }
+    $('#hud').innerHTML=ending+player('host',0,host)+'<div class="hud-mid"><div class="score"><span class="sh">'+Number(m.score[0])+'</span><span class="sep">対</span><span class="sc">'+Number(m.score[1])+'</span></div><div class="goal">First to 3 battlefields</div><div class="pips">'+pips+'</div><div class="phase"><span class="phase-name">'+(phase===1?'Open match':phase===4?'Match over':'Battle '+(Number(m.battle)+1)+' of 5')+'</span><span>'+esc(battleStatus(m))+'</span></div>'+(phase===2||phase===3?'<div class="phase"><span>Deadline</span><span class="phase-clock '+(seconds<3600?'urgent':'')+'">'+formatClock(seconds)+'</span></div>':'')+'<div class="phase"><span>Stake per player</span><span>'+esc(formatUSDC(m.stake))+'</span></div>'+action+'</div>'+player('chal',1,chal);
     const cancel=$('#cancelOpenBtn');if(cancel)cancel.addEventListener('click',()=>cancelOpen(state.matchId).catch(e=>toast(readError(e),true)));
     const timeout=$('#timeoutBtn');if(timeout)timeout.addEventListener('click',()=>claimTimeout(state.matchId).catch(e=>toast(readError(e),true)));
   }
@@ -845,7 +896,8 @@ tr:last-child td { border-bottom: 0; }
   async function init() {
     $('#heroArt').innerHTML=window.FD_ART.hero();buildBoard();renderProtocol();renderWallet();renderAll();
     $('#walletBtn').addEventListener('click',()=>{if(state.address&&state.chainId===CHAIN_ID)disconnectWallet();else connectWallet().catch(e=>toast(readError(e),true));});
-    $('#createMatchBtn').addEventListener('click',()=>createMatch().catch(e=>toast(readError(e),true)));
+    $('#confirmCreateMatchBtn').addEventListener('click',()=>createMatch().catch(e=>toast(readError(e),true)));
+    $('#createMatchBtn').addEventListener('click',()=>{ $('#stakeAmount').focus(); $('#createMatchPanel').scrollIntoView({behavior:'smooth',block:'center'}); });
     $('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)closeModal();});
     const refreshBtn=document.createElement('button');refreshBtn.type='button';refreshBtn.className='btn-line';refreshBtn.id='refreshBtn';refreshBtn.textContent='Refresh on-chain data';$('#createMatchBtn').insertAdjacentElement('beforebegin',refreshBtn);refreshBtn.addEventListener('click',async()=>{await refreshLobby();await refreshSelected();if(state.address){await loadMyMatches();await refreshWalletData();renderWallet();renderLobby();}toast('On-chain data refreshed.');});
     try {
