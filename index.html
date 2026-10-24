@@ -94,8 +94,6 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 @keyframes brushIn { to { clip-path: inset(0 0 0 0); } }
 @keyframes fadeIn { to { opacity: 1; } }
 .hero-rule { margin: 6px auto 28px; font-family: var(--serif); font-size: clamp(1rem, 1.7vw, 1.3rem); color: var(--paper); opacity: 0; animation: fadeIn 1s 1.6s forwards; }
-.hero-cta { display: inline-block; padding: 13px 34px; border: 1px solid var(--gold); color: var(--gold-hi); text-decoration: none; font-weight: 700; letter-spacing: 0.04em; background: rgba(5, 5, 5, 0.55); transition: background 0.2s, color 0.2s; opacity: 0; animation: fadeIn 1s 1.9s forwards; }
-.hero-cta:hover { background: var(--gold); color: #000; }
 
 .sim-strip { background: #1a1408; border-bottom: 1px solid var(--line); padding: 10px clamp(14px, 3vw, 36px); text-align: center; font-size: 0.9rem; color: #e9d9a8; }
 .sim-strip p { margin: 0; max-width: 980px; margin-inline: auto; }
@@ -265,16 +263,11 @@ tr:last-child td { border-bottom: 0; }
 .btn-line { background: transparent; color: var(--gold-hi); }
 .btn-line:hover { background: #d9a93f22; }
 .match-row.yours { border-left-color: var(--gold); }
-.create-match-panel { margin: 16px 0 20px; padding: 18px 20px; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) auto; align-items: center; gap: 14px 22px; background: linear-gradient(120deg, #15110a, #0d0b0d 70%); border: 1px solid var(--line-strong); border-left: 3px solid var(--gold); }
-.stake-copy h3 { margin: 0 0 3px; color: var(--gold-hi); font-family: var(--serif); font-size: 1.15rem; }
-.stake-copy p { margin: 0; max-width: 58ch; color: var(--muted); font-size: .88rem; }
 .stake-field { display: grid; gap: 5px; color: var(--muted); font-size: .8rem; }
 .stake-input-wrap { display: flex; align-items: center; border: 1px solid var(--line-strong); background: #050505; }
 .stake-input-wrap .currency { padding: 0 10px; color: var(--gold); font-size: .78rem; font-weight: 800; border-right: 1px solid var(--line); }
 .stake-input-wrap input { width: 100%; min-width: 0; padding: 10px 12px; color: var(--paper); background: transparent; border: 0; outline: 0; font-variant-numeric: tabular-nums; }
 .stake-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--gold-hi); }
-.stake-footnote { grid-column: 1 / -1; margin: -4px 0 0; color: var(--muted); font-size: .78rem; }
-@media (max-width: 700px) { .create-match-panel { grid-template-columns: 1fr; gap: 12px; padding: 16px; } .stake-footnote { grid-column: auto; } }
 
 /* ---------- protocol ---------- */
 .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--gap); margin-bottom: 28px; }
@@ -283,8 +276,8 @@ tr:last-child td { border-bottom: 0; }
 .status-card h3 { margin: 0 0 4px; font-family: var(--serif); font-size: 1.15rem; }
 .status-card .tag { display: inline-block; font-size: 0.74rem; font-weight: 700; color: var(--tone); border: 1px solid var(--tone); padding: 1px 8px; border-radius: 999px; margin-bottom: 10px; }
 .status-card ul { margin: 0; padding-left: 18px; color: #cfc7b3; font-size: 0.92rem; }
-.rules, .contract { margin-top: 26px; }
-.rules h3, .contract h3 { font-family: var(--serif); font-size: 1.3rem; margin: 0 0 12px; }
+.rules { margin-top: 26px; }
+.rules h3 { font-family: var(--serif); font-size: 1.3rem; margin: 0 0 12px; }
 .rules ol { margin: 0; padding-left: 22px; max-width: 74ch; color: #d8d0bb; }
 .rules li { margin-bottom: 6px; }
 .st { font-size: 0.78rem; font-weight: 700; border-radius: 999px; padding: 2px 9px; border: 1px solid; white-space: nowrap; }
@@ -333,10 +326,34 @@ tr:last-child td { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
   html { scroll-behavior: auto; }
-  .hero-kanji, .hero-rule, .hero-cta { opacity: 1; }
+  .hero-kanji, .hero-rule { opacity: 1; }
   .title-svg g[filter="url(#brush)"], .title-stroke { clip-path: none; }
 }
 
+
+/* play bar: join the latest game, or set a stake and create one */
+.play-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin: 0 0 20px; padding: 18px 20px; background: linear-gradient(120deg, #15110a, #0d0b0d 70%); border: 1px solid var(--line-strong); }
+.play-join { display: grid; gap: 8px; justify-items: start; }
+.play-cta { cursor: pointer; padding: 14px 40px; border: 1px solid var(--gold); border-radius: 2px; font-weight: 700; font-size: 1.05rem; letter-spacing: .03em; background: linear-gradient(#f3d27a, #c08a2a); color: #190f02; }
+.play-cta:hover:not(:disabled) { filter: brightness(1.1); }
+.play-cta:disabled, .play-bar .btn-gold:disabled, .play-bar .btn-line:disabled { opacity: .55; cursor: wait; }
+.play-join-note { margin: 0; max-width: 30ch; font-size: .85rem; color: var(--muted); }
+.play-or { font-family: var(--serif); color: var(--gold); }
+.play-create { display: flex; align-items: flex-end; gap: 10px; }
+.play-create .btn-gold, .play-refresh { padding: 11px 22px; }
+.play-create .stake-input-wrap { width: 150px; }
+.play-refresh { margin-left: auto; align-self: center; }
+.play-fine { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .82rem; }
+@media (max-width: 700px) {
+  .play-bar { flex-direction: column; align-items: stretch; padding: 16px; gap: 12px; }
+  .play-join { justify-items: stretch; }
+  .play-cta { width: 100%; }
+  .play-or { text-align: center; }
+  .play-create { justify-content: space-between; }
+  .play-create .stake-field { flex: 1; }
+  .play-create .stake-input-wrap { width: 100%; }
+  .play-refresh { margin-left: 0; align-self: stretch; }
+}
 </style>
 </head>
 <body>
@@ -385,7 +402,6 @@ tr:last-child td { border-bottom: 0; }
         </svg>
       </h1>
       <p class="hero-rule">Five battlefields. A hundred credits each. Take three to win.</p>
-      <a class="hero-cta" href="#match">Enter the match</a>
     </div>
   </section>
 
@@ -409,17 +425,21 @@ tr:last-child td { border-bottom: 0; }
     <div class="section-head">
       <h2 id="lobbyTitle"><span lang="ja">陣営</span> Open matches</h2>
     </div>
-    <div class="create-match-panel" id="createMatchPanel">
-      <div class="stake-copy">
-        <h3>Set your stake</h3>
-        <p>Choose how much USDC each player puts in. The winner receives both stakes; cancelled matches are refundable.</p>
+    <div class="play-bar" id="playBar">
+      <div class="play-join">
+        <button type="button" class="play-cta" id="joinGameBtn">Join Game</button>
+        <p class="play-join-note" id="joinGameNote" aria-live="polite">Checking for open games…</p>
       </div>
-      <label class="stake-field" for="stakeAmount">
-        <span>Stake per player</span>
-        <div class="stake-input-wrap"><span class="currency">USDC</span><input id="stakeAmount" type="number" inputmode="decimal" min="0.000001" max="1000000" step="0.01" value="1" placeholder="1.00"></div>
-      </label>
-      <button type="button" class="btn-gold" id="confirmCreateMatchBtn">Create match</button>
-      <p class="stake-footnote">You’ll approve USDC and confirm the transaction in your wallet. No popup prompt.</p>
+      <span class="play-or" aria-hidden="true">or</span>
+      <div class="play-create" id="createMatchPanel">
+        <label class="stake-field" for="stakeAmount">
+          <span>Stake per player</span>
+          <div class="stake-input-wrap"><span class="currency">USDC</span><input id="stakeAmount" type="number" inputmode="decimal" min="0.000001" max="1000000" step="0.01" value="1" placeholder="1.00"></div>
+        </label>
+        <button type="button" class="btn-gold" id="confirmCreateMatchBtn">Create match</button>
+      </div>
+      <button type="button" class="btn-line play-refresh" id="refreshBtn" title="Reload open games and the selected match from Base">Refresh</button>
+      <p class="play-fine">Stakes are real USDC on Base. You approve USDC, then confirm each transaction in your wallet. The winner receives both stakes, and a cancelled match is refunded.</p>
     </div>
     <div class="lobby-list" id="lobbyList"></div>
     <p class="fine">Open matches shown here are read from the deployed contract on Base Mainnet. Only recent match IDs are scanned to keep RPC reads bounded.</p>
@@ -445,16 +465,6 @@ tr:last-child td { border-bottom: 0; }
       </ol>
     </div>
 
-    <div class="contract">
-      <h3>Contract interface</h3>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th scope="col">Function</th><th scope="col">What it does</th><th scope="col">Phase</th><th scope="col">Status</th></tr></thead>
-          <tbody id="ifaceBody"></tbody>
-        </table>
-      </div>
-      <p class="fine" id="eventsLine"></p>
-    </div>
   </section>
 </main>
 
@@ -711,12 +721,66 @@ tr:last-child td { border-bottom: 0; }
       toast('USDC approval confirmed.');
     }
   }
-  async function txAction(label, action) {
-    if (state.loading) return;
-    state.loading=true; renderWallet();
-    try { const tx=await action(); toast(label + ' submitted. Waiting for Base confirmation…'); await tx.wait(); toast(label + ' confirmed on Base.'); await refreshWalletData(); await refreshLobby(); if (state.matchId) await loadMatch(state.matchId); renderWallet(); renderAll(); }
-    catch(e) { toast(readError(e),true); throw e; }
-    finally { state.loading=false; renderWallet(); renderAll(); }
+
+async function txAction(label, action) {
+  if (state.loading) return;
+
+  state.loading = true;
+  renderWallet();
+
+  let confirmed = false;
+
+  try {
+    const tx = await action();
+
+    toast(label + ' submitted. Waiting for Base confirmation…');
+
+    await tx.wait();
+    confirmed = true;
+
+    toast(label + ' confirmed on Base.');
+  } catch (e) {
+    toast(
+      confirmed
+        ? label + ' confirmed, but a later operation failed.'
+        : readError(e),
+      true
+    );
+    throw e;
+  } finally {
+    // Refreshing the UI must not change or delete saved reveal secrets.
+    try {
+      await refreshWalletData();
+      await refreshLobby();
+
+      if (state.matchId !== null && state.matchId !== undefined) {
+        await loadMatch(state.matchId);
+      }
+
+      renderWallet();
+      renderAll();
+    } catch (refreshError) {
+      console.warn('Post-transaction refresh failed:', refreshError);
+      toast(
+        'Could not refresh the latest match data. Use Refresh.',
+        true
+      );
+    }
+
+    state.loading = false;
+    renderWallet();
+    renderAll();
+  }
+}
+
+  // True only when the wallet itself reported that the user rejected the request. That proves no
+  // transaction was sent. Timeouts, dropped connections and failures after submission do NOT count.
+  function isUserRejection(e) {
+    if(!e)return false;
+    const code=e.code!==undefined?e.code:(e.info&&e.info.error?e.info.error.code:undefined);
+    if(code==='ACTION_REJECTED'||code===4001)return true;
+    if(e.info&&e.info.error&&e.info.error.code===4001)return true;
+    return /user rejected|user denied|rejected the request/i.test(String(e.shortMessage||e.message||''));
   }
   function readError(e) {
     if (e && e.shortMessage) return e.shortMessage;
@@ -750,17 +814,102 @@ tr:last-child td { border-bottom: 0; }
     await loadMatch(id); document.getElementById('match').scrollIntoView({behavior:'smooth'});
   }
   async function cancelOpen(id) { requireWallet(); await txAction('Cancel match #' + id,()=>state.contract.cancelOpenMatch(id)); }
-  async function commitBid() {
-    requireWallet(); const m=state.match; if (!m) throw new Error('Select a match first.');
-    if (Number(m.phase)!==2) throw new Error('The match is not in commit phase.');
-    const side=sideFor(m); if (side<0) throw new Error('Only players in this match can commit.');
-    if (m.commits[side]!==ethers.ZeroHash) throw new Error('You have already committed this battle.');
-    const amount=Number(state.selectedBids[Number(m.battle)]||0); if (!Number.isInteger(amount)||amount<0||amount>Number(m.credits[side])) throw new Error('Bid must be between 0 and your remaining credits.');
-    const salt=randSalt(), hash=computeHash(state.matchId,Number(m.battle),state.address,amount,salt);
-    // Persist before asking the wallet to sign so refreshes cannot lose the reveal secret.
-    saveSecret(state.matchId,Number(m.battle),state.address,{amount,salt,hash,createdAt:Date.now()});
-    await txAction('Commit bid',()=>state.contract.commitBid(state.matchId,hash));
+
+async function commitBid() {
+  requireWallet();
+
+  if (state.matchId === null || state.matchId === undefined) {
+    throw new Error('Select a match first.');
   }
+
+  // Always check fresh on-chain state before creating or saving a secret.
+  const id = state.matchId;
+  const freshMatch = await readContract.getMatch(id);
+  const battle = Number(freshMatch.battle);
+
+  if (Number(freshMatch.phase) !== 2) {
+    await loadMatch(id);
+    throw new Error('The match is no longer in commit phase. Match state refreshed.');
+  }
+
+  const side = sideFor(freshMatch);
+  if (side < 0) {
+    throw new Error('Only players in this match can commit.');
+  }
+
+  // If a commitment exists on-chain, NEVER generate or save another secret.
+  if (freshMatch.commits[side] !== ethers.ZeroHash) {
+    await loadMatch(id);
+    throw new Error(
+      'Your bid is already committed on-chain. Your original reveal secret has been preserved. Do not commit again.'
+    );
+  }
+
+  const addr = state.address;
+  let secret = getSecret(id, battle, addr);
+  let createdThisAttempt = false;
+
+  if (secret) {
+    // Reuse a previously saved secret after retries or page refreshes.
+    // Never silently replace it with a new salt.
+    const expected = computeHash(
+      id, battle, addr, Number(secret.amount), secret.salt
+    );
+
+    if (
+      expected.toLowerCase() !== String(secret.hash).toLowerCase()
+    ) {
+      throw new Error(
+        'Your saved secret is inconsistent. No new secret was saved. Do not continue until it is recovered.'
+      );
+    }
+  } else {
+    // Only create a secret when none exists for this battle.
+    const amount = Number(state.selectedBids[battle] || 0);
+
+    if (
+      !Number.isInteger(amount) ||
+      amount < 0 ||
+      amount > Number(freshMatch.credits[side])
+    ) {
+      throw new Error(
+        'Bid must be between 0 and your remaining credits.'
+      );
+    }
+
+    const salt = randSalt();
+    const hash = computeHash(id, battle, addr, amount, salt);
+
+    secret = {
+      amount,
+      salt,
+      hash,
+      createdAt: Date.now()
+    };
+
+    // Save once, before the wallet transaction.
+    saveSecret(id, battle, addr, secret);
+    createdThisAttempt = true;
+  }
+
+  // Reuse the SAME hash on every retry.
+  try {
+    await txAction(
+      'Commit bid',
+      () => state.contract.commitBid(id, secret.hash)
+    );
+  } catch (e) {
+    // If the wallet rejected the request, no transaction exists, so a secret created by THIS click
+    // is safe to discard and the player can pick a new amount. A secret that existed before this
+    // click may belong to an earlier transaction that is still confirming, so it is never deleted.
+    if (createdThisAttempt && isUserRejection(e)) {
+      clearSecret(id, battle, addr);
+      renderAll();
+    }
+    throw e;
+  }
+}
+
   async function revealBid() {
     requireWallet(); const m=state.match; if (!m || Number(m.phase)!==3) throw new Error('The match is not in reveal phase.');
     const side=sideFor(m); if (side<0) throw new Error('Only players in this match can reveal.');
@@ -774,6 +923,7 @@ tr:last-child td { border-bottom: 0; }
   async function withdraw() { requireWallet(); if (state.claimable===0n) throw new Error('No USDC is currently claimable.'); await txAction('Withdraw USDC',()=>state.contract.withdraw()); }
   async function refreshLobby() {
     try {
+      state.lobbyError=false;
       const last=Number(await readContract.lastMatchId());
       if (!last) state.lobby=[];
       else {
@@ -782,7 +932,8 @@ tr:last-child td { border-bottom: 0; }
         const rows=await Promise.all(ids.map(async id=>({id,match:await readContract.getMatch(id)})));
         state.lobby=rows.filter(x=>Number(x.match.phase)===1).sort((a,b)=>Number(b.id-a.id));
       }
-    } catch(e) { console.warn('Lobby read failed',e); state.lobby=[]; }
+    } catch(e) { console.warn('Lobby read failed',e); state.lobby=[]; state.lobbyError=true; }
+    state.lobbyLoaded=true;
     renderLobby();
   }
   async function loadMatch(id) {
@@ -881,8 +1032,9 @@ tr:last-child td { border-bottom: 0; }
     const credits=Number(m.credits[side<0?0:side]);
     if(side<0) {r.state.textContent=phase===2?'Commit phase':'Reveal phase';r.btn.textContent='Player action required';r.note.textContent='Connect as one of the players to submit actions.';return;}
     if(phase===2) {
-      const committed=m.commits[side]!==ethers.ZeroHash, oppCommitted=m.commits[1-side]!==ethers.ZeroHash;
+      const committed=m.commits[side]!==ethers.ZeroHash, oppCommitted=m.commits[1-side]!==ethers.ZeroHash, savedBid=committed?null:getSecret(state.matchId,Number(m.battle),state.address);
       if(committed) {const secret=getSecret(state.matchId,Number(m.battle),state.address);r.num.textContent=secret?secret.amount:'Hidden';r.after.textContent='Secret saved in this browser';r.state.textContent='Your bid committed';r.btn.textContent='Committed';r.note.textContent='Your bid is hidden on-chain until both players commit.';}
+      else if(savedBid) {const amt=Number(savedBid.amount);r.slider.max=credits;r.slider.value=amt;r.slider.style.setProperty('--pct',(amt/Math.max(1,credits)*100)+'%');r.slider.disabled=true;r.num.textContent=amt;r.after.innerHTML='Saved bid<br><b>'+(credits-amt)+'</b> left if revealed';r.state.textContent='Saved bid ready';r.btn.disabled=state.loading;r.btn.textContent=state.loading?'Waiting…':'Commit saved bid ('+amt+')';r.note.textContent='This bid is already saved in this browser, and an earlier attempt may still be confirming. It will be reused so your reveal still works.';}
       else {const v=Math.min(credits,Number(state.selectedBids[i]||0));r.slider.disabled=false;r.slider.max=credits;r.slider.value=v;r.slider.style.setProperty('--pct',(v/Math.max(1,credits)*100)+'%');r.num.textContent=v;r.after.innerHTML='Left after bid<br><b>'+(credits-v)+'</b> of '+credits;r.state.textContent=oppCommitted?'Opponent committed':'Commit phase';r.btn.disabled=state.loading;r.btn.textContent=state.loading?'Waiting…':'Commit Army';r.note.textContent='The bid and salt are stored locally before the wallet transaction. Do not clear browser data before revealing.';}
     } else if(phase===3) {
       const revealed=Boolean(m.revealed[side]),secret=getSecret(state.matchId,Number(m.battle),state.address);r.num.textContent=secret?secret.amount:'Hidden';r.after.textContent='Both commitments are fixed';r.state.textContent=revealed?'Your bid revealed':'Reveal phase';r.btn.className='commit reveal';r.btn.disabled=revealed||!secret||state.loading;r.btn.textContent=revealed?'Revealed':!secret?'Reveal secret missing':'Reveal Army';r.note.textContent=revealed?'Waiting for the opponent to reveal.':!secret?'This browser has no saved salt for this commitment; it cannot be recovered from the contract.':'Reveal your saved bid. The contract verifies the exact commitment.';
@@ -932,6 +1084,7 @@ tr:last-child td { border-bottom: 0; }
     $('#ledgerWrap').innerHTML='<table><thead><tr><th>Battlefield</th><th class="num">Host bid</th><th class="num">Challenger bid</th><th>Winner</th><th>Decided by</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
   function renderLobby() {
+    renderJoinNote();
     let html='';
     if(state.address&&state.myMatches.length){html+='<div class="match-row yours"><span class="mid">Your matches</span><span class="who"><span>Recent on-chain matches</span><span>'+state.myMatches.length+' loaded</span></span><span class="meta">Wallet history</span><select id="myMatchSelect" aria-label="Select one of your matches"><option value="">Select match…</option>'+state.myMatches.map(id=>'<option value="'+id+'" '+(state.matchId!==null&&BigInt(state.matchId)===id?'selected':'')+'>Match #'+id+'</option>').join('')+'</select></div>';}
     if(!state.lobby.length) html+='<div class="empty">No open matches found in the recent on-chain match range. Create one to start a real match.</div>';
@@ -944,17 +1097,66 @@ tr:last-child td { border-bottom: 0; }
   }
   function renderProtocol() {
     $('#statusGrid').innerHTML='<div class="status-card live"><span class="tag">Live on Base</span><h3>On-chain</h3><ul><li>Reads deployed contract state</li><li>Open matches from listOpenMatches</li><li>USDC stakes and allowance approvals</li><li>Commit/reveal, battle results, timeouts and withdrawals</li></ul></div><div class="status-card live"><span class="tag">Configured</span><h3>Deployment</h3><ul><li>Network: Base Mainnet (8453)</li><li>Game: <code>'+CONTRACT_ADDRESS+'</code></li><li>USDC: <code>'+USDC_ADDRESS+'</code></li><li id="contractCheck">Checking contract configuration…</li></ul></div><div class="status-card sim"><span class="tag">Important</span><h3>Secret safety</h3><ul><li>Bid salt is stored in this browser before the commit transaction</li><li>Keep this browser storage until you reveal</li><li>Never clear site data mid-battle</li><li>Only sign transactions you understand</li></ul></div>';
-    const funcs=[['createMatch(uint256 stake)','Open a match and stake USDC','Open'],['joinMatch(uint256 id)','Join an open match with matching USDC','Open'],['commitBid(uint256 id, bytes32 hash)','Commit a hidden bid','Commit'],['revealBid(uint256 id, uint8 amount, bytes32 salt)','Reveal a committed bid','Reveal'],['claimTimeout(uint256 id)','Settle an expired deadline','Commit / Reveal'],['withdraw()','Withdraw credited USDC','Any'],['getMatch(uint256 id)','Read real match state','View'],['getBattles(uint256 id)','Read resolved battle results','View'],['listOpenMatches(uint256 from, uint256 limit)','Read open matches','View']];
-    $('#ifaceBody').innerHTML=funcs.map(f=>'<tr><td><code>'+f[0]+'</code></td><td>'+f[1]+'</td><td>'+f[2]+'</td><td><span class="st live">Connected</span></td></tr>').join('');
-    $('#eventsLine').textContent='Live contract events are available from the deployed contract. UI state refreshes after confirmed transactions and periodically while a match is selected.';
+  }
+
+  /* ---------- Join Game (hero) ---------- */
+  // state.lobby is newest first. Skip open games hosted by the connected wallet: you cannot join your own.
+  function latestJoinable() {
+    const me=state.address?state.address.toLowerCase():null;
+    return state.lobby.find(({match:m})=>!me||m.players[0].toLowerCase()!==me)||null;
+  }
+  function renderJoinNote() {
+    const note=$('#joinGameNote'),join=$('#joinGameBtn'),create=$('#confirmCreateMatchBtn');
+    if(!note||!join)return;
+    const j=latestJoinable();
+    join.dataset.shown=j?(String(j.id)+':'+String(j.match.stake)):'';
+    if(!state.lobbyLoaded) note.textContent='Checking for open games…';
+    else if(state.lobbyError) note.textContent='Could not read open games from Base. Use Refresh.';
+    else if(j) note.textContent='Latest open game: #'+j.id+' · '+formatUSDC(j.match.stake)+' stake each';
+    else if(state.lobby.length) note.textContent='The only open game is yours. Wait for a challenger, or cancel it below.';
+    else note.textContent='No open games right now. Set a stake and create one.';
+    join.disabled=state.loading;
+    if(create)create.disabled=state.loading;
+  }
+  async function joinLatestGame() {
+    if(state.loading)return;
+    const shownKey=($('#joinGameBtn').dataset.shown)||'';
+    if(!state.address) await connectWallet();
+    requireWallet();
+    await refreshLobby();
+    const j=latestJoinable();
+    if(!j) {
+      toast(state.lobby.length?'The only open game is your own. Wait for a challenger.':'No open games right now. Set a stake and create one.',true);
+      const f=$('#stakeAmount'); if(f)f.focus();
+      return;
+    }
+    const key=String(j.id)+':'+String(j.match.stake);
+    if(shownKey&&shownKey!==key) {
+      // The newest game changed after the button text was shown. Real money is involved, so confirm.
+      showModal('<div class="kanji-big" lang="ja">戦</div><h2 id="modalTitle">Join match #'+esc(j.id)+'?</h2><p>The newest open game changed. You will stake '+esc(formatUSDC(j.match.stake))+', and the winner receives '+esc(formatUSDC(j.match.stake*2n))+'.</p><div class="modal-actions"><button type="button" class="btn-gold" id="confirmJoinBtn">Join match #'+esc(j.id)+'</button><button type="button" class="btn-line" id="cancelJoinBtn">Not now</button></div>','#confirmJoinBtn');
+      $('#confirmJoinBtn').addEventListener('click',()=>{closeModal();joinMatch(j.id).catch(e=>toast(readError(e),true));});
+      $('#cancelJoinBtn').addEventListener('click',closeModal);
+      return;
+    }
+    await joinMatch(j.id);
   }
   function renderAll() { for(let i=0;i<5;i++)renderCard(i);renderHud();renderLedger();renderLobby(); }
   async function init() {
     $('#heroArt').innerHTML=window.FD_ART.hero();buildBoard();renderProtocol();renderWallet();renderAll();
     $('#walletBtn').addEventListener('click',()=>{if(state.address&&state.chainId===CHAIN_ID)disconnectWallet();else connectWallet().catch(e=>toast(readError(e),true));});
     $('#confirmCreateMatchBtn').addEventListener('click',()=>createMatch().catch(e=>toast(readError(e),true)));
+    $('#joinGameBtn').addEventListener('click',()=>joinLatestGame().catch(e=>toast(readError(e),true)));
     $('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)closeModal();});
-    const refreshBtn=document.createElement('button');refreshBtn.type='button';refreshBtn.className='btn-line';refreshBtn.id='refreshBtn';refreshBtn.textContent='Refresh on-chain data';$('.lobby .section-head').appendChild(refreshBtn);refreshBtn.addEventListener('click',async()=>{await refreshLobby();await refreshSelected();if(state.address){await loadMyMatches();await refreshWalletData();renderWallet();renderLobby();}toast('On-chain data refreshed.');});
+    const refreshBtn=$('#refreshBtn');
+    refreshBtn.addEventListener('click',async()=>{
+      refreshBtn.disabled=true;refreshBtn.textContent='Refreshing…';
+      try{
+        await refreshLobby();await refreshSelected();
+        if(state.address){await loadMyMatches();await refreshWalletData();renderWallet();renderLobby();}
+        toast('On-chain data refreshed.');
+      }catch(e){toast(readError(e),true);}
+      finally{refreshBtn.disabled=false;refreshBtn.textContent='Refresh';}
+    });
     try {
       const [configuredUsdc,decimals,symbol]=await Promise.all([readContract.usdc(),readUSDC.decimals(),readUSDC.symbol()]);
       state.decimals=Number(decimals);state.symbol=symbol;
