@@ -210,21 +210,25 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 .commit.reveal:hover:not(:disabled) { background: #d9a93f22; filter: none; }
 .card-note { margin: 0; font-size: 0.8rem; color: var(--muted); min-height: 1.2em; }
 .card-note code { word-break: break-all; }
-#matchEnding:empty { display: none; }
-#matchEnding { margin-bottom: var(--gap); }
-.match-ending { display: flex; align-items: center; gap: 18px; padding: 22px clamp(16px, 3vw, 32px); margin-bottom: 4px; border: 1px solid var(--line-strong); background: linear-gradient(105deg, #17110a, #090809 78%); }
-.match-ending .ending-mark { flex: 0 0 64px; width: 64px; height: 64px; display: grid; place-items: center; font-family: var(--serif); font-size: 2.2rem; font-weight: 800; border: 1px solid currentColor; }
-.match-ending strong { display: block; font-family: var(--serif); font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; letter-spacing: .04em; }
-.match-ending p { margin: 5px 0 0; color: #c7beaa; font-size: .9rem; }
-.ending-eyebrow { display: block; margin-bottom: 3px; font-size: .72rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
-.match-ending.victory { color: var(--gold-hi); border-color: #d9a93f99; box-shadow: inset 4px 0 var(--gold); }
-.match-ending.defeat { color: #ff8b7f; border-color: #ff6a5c88; box-shadow: inset 4px 0 #ff6a5c; }
-.match-ending.draw { color: var(--gold-hi); }
-@media (max-width: 560px) { .match-ending { align-items: flex-start; gap: 12px; padding: 16px; } .match-ending .ending-mark { flex-basis: 46px; width: 46px; height: 46px; font-size: 1.6rem; } }
+/* result overlay: fades in over the battlefield cards when the match ends */
+.board-wrap { position: relative; }
+.result-overlay { position: absolute; inset: 0; z-index: 30; display: flex; justify-content: center; align-items: flex-start; padding: 0 12px; opacity: 0; transition: opacity .9s ease; }
+.result-overlay[hidden] { display: none; }
+.result-overlay.is-in { opacity: 1; }
+.result-scrim { position: absolute; inset: -8px 0; background: radial-gradient(ellipse at 50% 28%, rgba(0,0,0,.5), rgba(0,0,0,.88) 78%); backdrop-filter: blur(2px); cursor: pointer; }
+.result-card { --tone: var(--gold-hi); position: sticky; top: calc(var(--topbar-h, 58px) + 16vh); margin-top: 7vh; z-index: 1; width: min(540px, 100%); padding: 30px 28px 26px; text-align: center; background: linear-gradient(#17110a, #090809); border: 1px solid var(--tone); box-shadow: 0 0 90px color-mix(in srgb, var(--tone) 28%, transparent), 0 24px 60px #000c; transform: translateY(16px) scale(.96); transition: transform .9s cubic-bezier(.2, .9, .3, 1); }
+.result-overlay.is-in .result-card { transform: none; }
+.result-card.tone-defeat { --tone: #ff8b7f; background: linear-gradient(#1a0c0b, #090809); }
+.result-card.tone-draw { --tone: var(--gold); }
+.result-mark { font-family: var(--serif); font-weight: 800; font-size: clamp(4.2rem, 12vw, 6.6rem); line-height: 1; color: var(--tone); text-shadow: 0 0 44px color-mix(in srgb, var(--tone) 55%, transparent); }
+.result-card h3 { margin: 6px 0 2px; font-family: var(--serif); font-size: clamp(2rem, 6vw, 3.1rem); letter-spacing: .08em; color: var(--tone); }
+.result-score { margin: 0; font-family: var(--serif); font-size: 1.15rem; color: var(--paper); }
+.result-card p.result-text { margin: 8px auto 20px; max-width: 44ch; color: #d3cab4; font-size: .95rem; }
+.result-card .btn-gold, .result-card .btn-line { min-width: 190px; }
 
 /* reveal clash overlay */
 .clash { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-items: center; background: radial-gradient(ellipse at 50% 42%, #0007 0%, #000a 100%); padding: 0 8px 46px; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
-.card.is-resolved .clash { opacity: 1; }
+.card.bids-shown .clash { opacity: 1; }
 .clash .bid { font-family: var(--serif); font-weight: 800; font-size: clamp(2.2rem, 3.4vw, 3.2rem); font-variant-numeric: tabular-nums; line-height: 1; text-align: center; }
 .clash .bid small { display: block; font-family: var(--sans); font-weight: 500; font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
 .clash .bid.h { color: var(--host); } .clash .bid.c { color: var(--chal); }
@@ -408,9 +412,11 @@ tr:last-child td { border-bottom: 0; }
   <section class="sim-strip" aria-label="Network status"><p><strong>Live mode.</strong> Match state and lobby entries are read from Base Mainnet. Staking uses real USDC. <a href="#protocol">Review contract details and secret-safety notes</a></p></section>
 
   <section class="match" id="match" aria-label="Current match">
-    <div id="matchEnding" aria-live="polite"></div>
     <div class="hud" id="hud" aria-live="polite"></div>
-    <div class="board" id="battlefields"></div>
+    <div class="board-wrap" id="boardWrap">
+      <div class="board" id="battlefields"></div>
+      <div class="result-overlay" id="resultOverlay" role="dialog" aria-labelledby="resultTitle" hidden></div>
+    </div>
   </section>
 
   <section class="ledger" id="ledger" aria-labelledby="ledgerTitle">
@@ -1015,14 +1021,13 @@ async function commitBid() {
   function renderCard(i) {
     const r=state.cards[i],m=state.match;if(!r)return;
     const me=m?meSide():null, side=me==='host'?0:me==='chal'?1:-1, phase=m?Number(m.phase):0, active=m&&phase!==1&&phase!==4&&i===Number(m.battle), b=state.battles[i];
-    r.root.className='card'+(me?' side-'+me:'')+(b?' is-resolved winner-'+b.winner:'')+(active?' is-active':'');r.vrf.hidden=true;
+    r.root.className='card'+(me?' side-'+me:'')+(b?' is-resolved winner-'+b.winner:'')+(b&&phase===4?' bids-shown':'')+(active?' is-active':'');r.vrf.hidden=true;
     if(b) {
       const ended=phase===4;
-      const hostVisible=ended||side===0, chalVisible=ended||side===1;
       r.bh.className='bid h '+(b.winner==='host'?'win':'lose');r.bc.className='bid c '+(b.winner==='chal'?'win':'lose');
-      r.bh.innerHTML=(hostVisible?b.host:'Hidden')+'<small>Host</small>';r.bc.innerHTML=(chalVisible?b.chal:'Hidden')+'<small>Challenger</small>';
+      r.bh.innerHTML=ended?b.host+'<small>Host</small>':'';r.bc.innerHTML=ended?b.chal+'<small>Challenger</small>':'';
       r.state.textContent=roleName(b.winner)+' won';r.state.className='card-state win-'+b.winner;r.vrf.hidden=!b.tie;r.vrf.textContent=b.rule==='credits'?'Tie-break applied':'Tie: battle order';r.slider.disabled=true;r.slider.value=0;
-      r.num.textContent=side===0?b.host:side===1?b.chal:ended?'—':'Hidden';r.after.textContent=ended?'Battle settled':'Opponent bid hidden until match ends';r.btn.disabled=true;r.btn.textContent=b.winner===me?'Battlefield won':'Battlefield settled';r.note.textContent=ended?(b.tie?'Tie-break applied by contract.':'Both bids were spent.'):'Winner shown; both bids remain concealed until the match ends.';return;
+      r.num.textContent=side===0?b.host:side===1?b.chal:'—';r.after.textContent=ended?'Battle settled':(side<0?'':'Your bid');r.btn.disabled=true;r.btn.textContent=b.winner===me?'Battlefield won':'Battlefield settled';r.note.textContent=ended?(b.tie?'Tie-break applied by contract.':'Both bids were spent.'):'Both bids are shown when the match ends.';return;
     }
     r.bh.textContent='';r.bc.textContent='';r.slider.disabled=true;r.slider.max=100;r.slider.value=0;r.num.textContent='—';r.after.textContent='';r.btn.disabled=true;r.btn.className='commit';
     if(!m) {r.state.textContent='No match selected';r.btn.textContent='Select a match';r.note.textContent='Choose a real match from the lobby below.';return;}
@@ -1040,8 +1045,52 @@ async function commitBid() {
       const revealed=Boolean(m.revealed[side]),secret=getSecret(state.matchId,Number(m.battle),state.address);r.num.textContent=secret?secret.amount:'Hidden';r.after.textContent='Both commitments are fixed';r.state.textContent=revealed?'Your bid revealed':'Reveal phase';r.btn.className='commit reveal';r.btn.disabled=revealed||!secret||state.loading;r.btn.textContent=revealed?'Revealed':!secret?'Reveal secret missing':'Reveal Army';r.note.textContent=revealed?'Waiting for the opponent to reveal.':!secret?'This browser has no saved salt for this commitment; it cannot be recovered from the contract.':'Reveal your saved bid. The contract verifies the exact commitment.';
     }
   }
+
+  /* ---------- Result overlay (fades in over the cards when a match ends) ---------- */
+  const resultState = { key: null, dismissed: new Set(), wired: false };
+  function resultKey() { return String(state.matchId) + ':' + (state.address || ''); }
+  function resultInfo(m) {
+    const outcome=Number(m.outcome), winner=String(m.winner||'').toLowerCase(), zero='0x0000000000000000000000000000000000000000';
+    const me=state.address?state.address.toLowerCase():null;
+    const isPlayer=!!me&&m.players.some(p=>p.toLowerCase()===me);
+    const mySide=sideFor(m);
+    const sc=[Number(m.score[0]),Number(m.score[1])];
+    const score=isPlayer?(sc[mySide]+' – '+sc[1-mySide]):('Host '+sc[0]+' – '+sc[1]+' Challenger');
+    if(outcome===3||!winner||winner===zero) {
+      return { tone:'draw', mark:'返', title:'Match cancelled', score:'', text:isPlayer?'Your stake is credited back to you. Withdraw it from your claimable USDC balance.':'This match was cancelled and the stakes were refunded.' };
+    }
+    const won=!!me&&winner===me;
+    if(won) return { tone:'victory', mark:'勝', title:'Victory', score:'Final score '+score, text:(outcome===2?'Your opponent missed a deadline, so the match is yours. ':'You took three battlefields. ')+'Your winnings are credited to your claimable USDC balance.' };
+    if(isPlayer) return { tone:'defeat', mark:'敗', title:'Defeat', score:'Final score '+score, text:(outcome===2?'A deadline was missed, so your opponent took the match. ':'Your opponent took three battlefields. ')+'Your stake went to the winner.' };
+    return { tone:'draw', mark:'龍', title:'Match complete', score:'Final score '+score, text:'Winner: '+short(m.winner)+'. Connect as a player to see your personal result.' };
+  }
+  function hideResultNow() { const ov=$('#resultOverlay'); if(ov){ov.hidden=true;ov.classList.remove('is-in');} resultState.key=null; }
+  function closeResult() {
+    const ov=$('#resultOverlay'); if(!ov||ov.hidden)return;
+    resultState.dismissed.add(resultKey());
+    ov.classList.remove('is-in');
+    setTimeout(()=>{ if(!ov.classList.contains('is-in')) ov.hidden=true; },450);
+  }
+  function openResult() { resultState.dismissed.delete(resultKey()); resultState.key=null; if(state.match)updateResult(state.match); }
+  function updateResult(m) {
+    const ov=$('#resultOverlay'); if(!ov)return;
+    if(!resultState.wired) {
+      resultState.wired=true;
+      ov.addEventListener('click',e=>{ if(e.target.closest('#closeResultBtn')||e.target.classList.contains('result-scrim'))closeResult(); });
+      document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!ov.hidden)closeResult(); });
+    }
+    if(Number(m.phase)!==4) { hideResultNow(); return; }
+    if(resultState.dismissed.has(resultKey())) return;
+    const key=resultKey()+':'+Number(m.outcome);
+    if(resultState.key===key&&!ov.hidden) return; // already showing: do not restart the fade on every refresh
+    resultState.key=key;
+    const r=resultInfo(m);
+    ov.innerHTML='<div class="result-scrim"></div><div class="result-card tone-'+r.tone+'"><div class="result-mark" lang="ja" aria-hidden="true">'+r.mark+'</div><h3 id="resultTitle">'+esc(r.title)+'</h3>'+(r.score?'<p class="result-score">'+esc(r.score)+'</p>':'')+'<p class="result-text">'+esc(r.text)+'</p><button type="button" class="btn-gold" id="closeResultBtn">View battlefields</button></div>';
+    ov.hidden=false;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ ov.classList.add('is-in'); const b=$('#closeResultBtn'); if(b&&(document.activeElement===document.body||!document.activeElement))b.focus({preventScroll:true}); }));
+  }
   function renderHud() {
-    const m=state.match; if(!m) {$('#matchEnding').innerHTML='';$('#hud').innerHTML='<div class="hud-mid" style="grid-column:1/-1"><div class="phase-name">No match selected</div><div>Connect your wallet and select an on-chain match from the lobby.</div></div>';return;}
+    const m=state.match; if(!m) {hideResultNow();$('#hud').innerHTML='<div class="hud-mid" style="grid-column:1/-1"><div class="phase-name">No match selected</div><div>Connect your wallet and select an on-chain match from the lobby.</div></div>';return;}
     const side=meSide(),phase=Number(m.phase),host=Number(m.credits[0]),chal=Number(m.credits[1]);let pips='';
     for(let i=0;i<5;i++){const b=state.battles[i];pips+='<span class="pip '+(b?b.winner:(i===Number(m.battle)&&phase!==4?'now':'') )+'" title="'+FIELDS[i].name+'"></span>';}
     function player(k,index,credits){
@@ -1052,25 +1101,12 @@ async function commitBid() {
     let action=''; if(phase===1&&side==='host') action='<button type="button" class="btn-line" id="cancelOpenBtn">Cancel open match</button>';
     if((phase===2||phase===3)&&deadline&&Date.now()/1000>deadline) action+='<button type="button" class="btn-gold" id="timeoutBtn">Claim timeout</button>';
     if(phase===4&&Number(m.outcome)===3) action+='<span>Cancelled · refund claimable</span>';
-    let ending='';
-    if(phase===4) {
-      const outcome=Number(m.outcome), winner=String(m.winner||'').toLowerCase();
-      if(outcome===3 || !winner || winner==='0x0000000000000000000000000000000000000000') {
-        ending='<div class="match-ending draw"><div class="ending-mark">返</div><div><strong>Match cancelled</strong><p>Your stake is credited back to you. Withdraw it from your claimable balance.</p></div></div>';
-      } else {
-        const won=!!state.address && winner===state.address.toLowerCase();
-        const isPlayer=!!state.address && m.players.some(p=>p.toLowerCase()===state.address.toLowerCase());
-        const title=won?'VICTORY — YOU WON':isPlayer?'DEFEAT — YOU LOST':'MATCH COMPLETE';
-        const reason=outcome===2?'The match was decided by a missed deadline.':'First to three battlefields wins.';
-        const tone=won?'victory':isPlayer?'defeat':'draw';
-        const mark=won?'勝':isPlayer?'敗':'龍';
-        const detail=won?'Your winnings are credited to your claimable USDC balance.':isPlayer?'The opponent won this match. Your stake went to the winner.':'Winner: '+short(m.winner)+'. Connect as a player to see your personal result.';
-        ending='<div class="match-ending '+tone+'"><div class="ending-mark">'+mark+'</div><div><span class="ending-eyebrow">'+(won?'Five Dragons · Victory':isPlayer?'Five Dragons · Defeat':'Five Dragons · Final result')+'</span><strong>'+title+'</strong><p>'+reason+' '+detail+'</p></div></div>';
-      }
-    }
-    $('#matchEnding').innerHTML=ending;$('#hud').innerHTML=player('host',0,host)+'<div class="hud-mid"><div class="score"><span class="sh">'+Number(m.score[0])+'</span><span class="sep">対</span><span class="sc">'+Number(m.score[1])+'</span></div><div class="goal">First to 3 battlefields</div><div class="pips">'+pips+'</div><div class="phase"><span class="phase-name">'+(phase===1?'Open match':phase===4?'Match over':'Battle '+(Number(m.battle)+1)+' of 5')+'</span><span>'+esc(battleStatus(m))+'</span></div>'+(phase===2||phase===3?'<div class="phase"><span>Deadline</span><span class="phase-clock '+(seconds<3600?'urgent':'')+'">'+formatClock(seconds)+'</span></div>':'')+'<div class="phase"><span>Stake per player</span><span>'+esc(formatUSDC(m.stake))+'</span></div>'+action+'</div>'+player('chal',1,chal);
+    if(phase===4) action+='<button type="button" class="btn-line" id="showResultBtn">Show result</button>';
+    $('#hud').innerHTML=player('host',0,host)+'<div class="hud-mid"><div class="score"><span class="sh">'+Number(m.score[0])+'</span><span class="sep">対</span><span class="sc">'+Number(m.score[1])+'</span></div><div class="goal">First to 3 battlefields</div><div class="pips">'+pips+'</div><div class="phase"><span class="phase-name">'+(phase===1?'Open match':phase===4?'Match over':'Battle '+(Number(m.battle)+1)+' of 5')+'</span><span>'+esc(battleStatus(m))+'</span></div>'+(phase===2||phase===3?'<div class="phase"><span>Deadline</span><span class="phase-clock '+(seconds<3600?'urgent':'')+'">'+formatClock(seconds)+'</span></div>':'')+'<div class="phase"><span>Stake per player</span><span>'+esc(formatUSDC(m.stake))+'</span></div>'+action+'</div>'+player('chal',1,chal);
     const cancel=$('#cancelOpenBtn');if(cancel)cancel.addEventListener('click',()=>cancelOpen(state.matchId).catch(e=>toast(readError(e),true)));
     const timeout=$('#timeoutBtn');if(timeout)timeout.addEventListener('click',()=>claimTimeout(state.matchId).catch(e=>toast(readError(e),true)));
+    const showBtn=$('#showResultBtn');if(showBtn)showBtn.addEventListener('click',openResult);
+    updateResult(m);
   }
   function renderLedger() {
     const m=state.match;if(!m){$('#ledgerSub').textContent='Select a match to see on-chain battle results.';$('#ledgerWrap').innerHTML='<p class="empty">No match selected.</p>';return;}
