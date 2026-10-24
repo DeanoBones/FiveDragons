@@ -836,7 +836,12 @@ tr:last-child td { border-bottom: 0; }
     const me=m?meSide():null, side=me==='host'?0:me==='chal'?1:-1, phase=m?Number(m.phase):0, active=m&&phase!==1&&phase!==4&&i===Number(m.battle), b=state.battles[i];
     r.root.className='card'+(me?' side-'+me:'')+(b?' is-resolved winner-'+b.winner:'')+(active?' is-active':'');r.vrf.hidden=true;
     if(b) {
-      r.bh.className='bid h '+(b.winner==='host'?'win':'lose');r.bc.className='bid c '+(b.winner==='chal'?'win':'lose');r.bh.innerHTML=b.host+'<small>Host</small>';r.bc.innerHTML=b.chal+'<small>Challenger</small>';r.state.textContent=roleName(b.winner)+' won';r.state.className='card-state win-'+b.winner;r.vrf.hidden=!b.tie;r.vrf.textContent=b.rule==='credits'?'Tie: more credits left':'Tie: battle order';r.slider.disabled=true;r.slider.value=0;r.num.textContent=side===0?b.host:side===1?b.chal:'—';r.after.textContent='Battle settled';r.btn.disabled=true;r.btn.textContent=b.winner===me?'Battlefield won':'Battlefield settled';r.note.textContent=b.tie?'Tie-break applied by contract.':'Both bids were spent.';return;
+      const ended=phase===4;
+      const hostVisible=ended||side===0, chalVisible=ended||side===1;
+      r.bh.className='bid h '+(b.winner==='host'?'win':'lose');r.bc.className='bid c '+(b.winner==='chal'?'win':'lose');
+      r.bh.innerHTML=(hostVisible?b.host:'Hidden')+'<small>Host</small>';r.bc.innerHTML=(chalVisible?b.chal:'Hidden')+'<small>Challenger</small>';
+      r.state.textContent=roleName(b.winner)+' won';r.state.className='card-state win-'+b.winner;r.vrf.hidden=!b.tie;r.vrf.textContent=b.rule==='credits'?'Tie-break applied':'Tie: battle order';r.slider.disabled=true;r.slider.value=0;
+      r.num.textContent=side===0?b.host:side===1?b.chal:ended?'—':'Hidden';r.after.textContent=ended?'Battle settled':'Opponent bid hidden until match ends';r.btn.disabled=true;r.btn.textContent=b.winner===me?'Battlefield won':'Battlefield settled';r.note.textContent=ended?(b.tie?'Tie-break applied by contract.':'Both bids were spent.'):'Winner shown; both bids remain concealed until the match ends.';return;
     }
     r.bh.textContent='';r.bc.textContent='';r.slider.disabled=true;r.slider.max=100;r.slider.value=0;r.num.textContent='—';r.after.textContent='';r.btn.disabled=true;r.btn.className='commit';
     if(!m) {r.state.textContent='No match selected';r.btn.textContent='Select a match';r.note.textContent='Choose a real match from the lobby below.';return;}
@@ -857,7 +862,10 @@ tr:last-child td { border-bottom: 0; }
     const m=state.match; if(!m) {$('#matchEnding').innerHTML='';$('#hud').innerHTML='<div class="hud-mid" style="grid-column:1/-1"><div class="phase-name">No match selected</div><div>Connect your wallet and select an on-chain match from the lobby.</div></div>';return;}
     const side=meSide(),phase=Number(m.phase),host=Number(m.credits[0]),chal=Number(m.credits[1]);let pips='';
     for(let i=0;i<5;i++){const b=state.battles[i];pips+='<span class="pip '+(b?b.winner:(i===Number(m.battle)&&phase!==4?'now':'') )+'" title="'+FIELDS[i].name+'"></span>';}
-    function player(k,index,credits){return '<div class="hud-side '+k+'"><div class="hud-who"><span class="role">'+roleName(k)+'</span>'+(side===k?'<span class="you">You</span>':'')+'<span class="addr">'+short(m.players[index])+'</span></div><div class="hud-credits"><span class="num">'+credits+'</span><span class="unit">credits left</span></div><div class="gauge"><i style="width:'+credits+'%"></i></div></div>';}
+    function player(k,index,credits){
+      const hidden=phase!==4&&(!side||(index===0?'host':'chal')!==side), shown=hidden?'Hidden':credits;
+      return '<div class="hud-side '+k+'"><div class="hud-who"><span class="role">'+roleName(k)+'</span>'+(side===k?'<span class="you">You</span>':'')+'<span class="addr">'+short(m.players[index])+'</span></div><div class="hud-credits"><span class="num">'+shown+'</span><span class="unit">'+(hidden?'credits concealed':'credits left')+'</span></div><div class="gauge"'+(hidden?' aria-label="Credits concealed until match ends" style="opacity:.12"':'')+'><i style="width:'+credits+'%"></i></div></div>';
+    }
     const deadline=Number(m.deadline),seconds=deadline?Math.max(0,deadline-Math.floor(Date.now()/1000)):0;
     let action=''; if(phase===1&&side==='host') action='<button type="button" class="btn-line" id="cancelOpenBtn">Cancel open match</button>';
     if((phase===2||phase===3)&&deadline&&Date.now()/1000>deadline) action+='<button type="button" class="btn-gold" id="timeoutBtn">Claim timeout</button>';
@@ -884,9 +892,13 @@ tr:last-child td { border-bottom: 0; }
   }
   function renderLedger() {
     const m=state.match;if(!m){$('#ledgerSub').textContent='Select a match to see on-chain battle results.';$('#ledgerWrap').innerHTML='<p class="empty">No match selected.</p>';return;}
-    $('#ledgerSub').textContent='Match #'+state.matchId+'. '+state.battles.length+' battlefield(s) resolved on Base.';
+    $('#ledgerSub').textContent='Match #'+state.matchId+'. '+state.battles.length+' battlefield(s) resolved on Base.'+(Number(m.phase)===4?' Final bids are revealed.':' Opponent bids are hidden until the match ends.');
     if(!state.battles.length){$('#ledgerWrap').innerHTML='<p class="empty">No completed battles yet. Results will appear after both players reveal.</p>';return;}
-    const rows=state.battles.map(b=>'<tr><td><span lang="ja">'+FIELDS[b.n].numeral+'</span> '+FIELDS[b.n].name+'</td><td class="num b-host">'+b.host+'</td><td class="num b-chal">'+b.chal+'</td><td class="w-'+b.winner+'">'+roleName(b.winner)+(b.winner===meSide()?' (you)':'')+'</td><td>'+(b.tie?'Tie-break ('+(b.rule==='credits'?'more credits left':'battle order')+')':'Higher bid')+'</td></tr>').join('');
+    const ended=Number(m.phase)===4, side=meSide();
+    const rows=state.battles.map(b=>{
+      const hostBid=ended||side==='host'?b.host:'Hidden', chalBid=ended||side==='chal'?b.chal:'Hidden';
+      return '<tr><td><span lang="ja">'+FIELDS[b.n].numeral+'</span> '+FIELDS[b.n].name+'</td><td class="num b-host">'+hostBid+'</td><td class="num b-chal">'+chalBid+'</td><td class="w-'+b.winner+'">'+roleName(b.winner)+(b.winner===side?' (you)':'')+'</td><td>'+(b.tie?'Tie-break ('+(b.rule==='credits'?'more credits left':'battle order')+')':'Higher bid')+'</td></tr>';
+    }).join('');
     $('#ledgerWrap').innerHTML='<table><thead><tr><th>Battlefield</th><th class="num">Host bid</th><th class="num">Challenger bid</th><th>Winner</th><th>Decided by</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
   function renderLobby() {
