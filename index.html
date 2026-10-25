@@ -321,8 +321,8 @@ tr:last-child td { border-bottom: 0; }
 .dragon-call.is-in { opacity: 1; pointer-events: auto; }
 .dragon-call .dc-scrim { position: absolute; inset: -8px 0; background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,.35), rgba(0,0,0,.82) 80%); cursor: pointer; }
 .dragon-call .dc-inner { --dragon: #f3c14b; position: sticky; top: calc(var(--topbar-h, 58px) + 12vh); margin-top: 6vh; z-index: 1; width: min(560px, 100%); text-align: center; padding: 8px 16px 18px; cursor: pointer; }
-.dc-dragon { width: min(400px, 78%); margin: 0 auto; color: var(--dragon); filter: drop-shadow(0 0 22px color-mix(in srgb, var(--dragon) 55%, transparent)); transform: translateY(26px) scale(.9); transition: transform 1.1s cubic-bezier(.2, .9, .3, 1); }
-.dc-dragon svg, .dc-dragon img { display: block; width: 100%; height: auto; }
+.dc-dragon { width: min(300px, 70%); margin: 0 auto; color: var(--dragon); filter: drop-shadow(0 0 22px color-mix(in srgb, var(--dragon) 55%, transparent)); transform: translateY(26px) scale(.9); transition: transform 1.1s cubic-bezier(.2, .9, .3, 1); }
+.dc-dragon svg, .dc-dragon img { display: block; width: 100%; height: auto; max-height: 30vh; margin: 0 auto; object-fit: contain; }
 .dc-dragon img { image-rendering: pixelated; }
 .dragon-call.is-in .dc-dragon { transform: none; animation: dragonFloat 3.2s ease-in-out .9s infinite alternate; }
 @keyframes dragonFloat { to { transform: translateY(-8px); } }
