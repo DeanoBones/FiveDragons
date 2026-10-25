@@ -103,7 +103,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 @media (max-width: 700px) { #walletSummary { display: none; } }
 
 /* ---------- sections ---------- */
-.match, .ledger, .lobby, .protocol { width: min(1560px, 100%); margin: 0 auto; padding: clamp(28px, 4vw, 56px) clamp(12px, 2.4vw, 32px); }
+.match, .lobby, .protocol { width: min(1560px, 100%); margin: 0 auto; padding: clamp(28px, 4vw, 56px) clamp(12px, 2.4vw, 32px); }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
 .section-head h2 { margin: 0; font-family: var(--serif); font-weight: 800; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
 .section-head h2 span { color: var(--gold); margin-right: 10px; }
@@ -243,7 +243,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---------- ledger ---------- */
-.ledger-wrap, .table-scroll { overflow-x: auto; border: 1px solid var(--line); background: var(--lacquer); }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); background: var(--lacquer); }
 table { width: 100%; border-collapse: collapse; min-width: 640px; }
 th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #221d22; vertical-align: top; }
 th { font-weight: 700; color: var(--gold); font-size: 0.85rem; background: #100d10; }
@@ -367,7 +367,6 @@ tr:last-child td { border-bottom: 0; }
   <a class="brand" href="#top" aria-label="Five Dragons home"><span class="brand-kanji" lang="ja">五龍</span><span class="brand-name">Five Dragons</span></a>
   <nav class="nav" aria-label="Sections">
     <a href="#match">Match</a>
-    <a href="#ledger">History</a>
     <a href="#lobby">Lobby</a>
     <a href="#protocol">Protocol</a>
   </nav>
@@ -417,14 +416,6 @@ tr:last-child td { border-bottom: 0; }
       <div class="board" id="battlefields"></div>
       <div class="result-overlay" id="resultOverlay" role="dialog" aria-labelledby="resultTitle" hidden></div>
     </div>
-  </section>
-
-  <section class="ledger" id="ledger" aria-labelledby="ledgerTitle">
-    <div class="section-head">
-      <h2 id="ledgerTitle"><span lang="ja">戦績</span> Battle history</h2>
-      <p class="section-sub" id="ledgerSub"></p>
-    </div>
-    <div class="ledger-wrap" id="ledgerWrap"></div>
   </section>
 
   <section class="lobby" id="lobby" aria-labelledby="lobbyTitle">
@@ -1107,17 +1098,6 @@ async function commitBid() {
     const showBtn=$('#showResultBtn');if(showBtn)showBtn.addEventListener('click',openResult);
     updateResult(m);
   }
-  function renderLedger() {
-    const m=state.match;if(!m){$('#ledgerSub').textContent='Select a match to see on-chain battle results.';$('#ledgerWrap').innerHTML='<p class="empty">No match selected.</p>';return;}
-    $('#ledgerSub').textContent='Match #'+state.matchId+'. '+state.battles.length+' battlefield(s) resolved on Base.'+(Number(m.phase)===4?' Final bids are revealed.':' Opponent bids are hidden until the match ends.');
-    if(!state.battles.length){$('#ledgerWrap').innerHTML='<p class="empty">No completed battles yet. Results will appear after both players reveal.</p>';return;}
-    const ended=Number(m.phase)===4, side=meSide();
-    const rows=state.battles.map(b=>{
-      const hostBid=ended||side==='host'?b.host:'Hidden', chalBid=ended||side==='chal'?b.chal:'Hidden';
-      return '<tr><td><span lang="ja">'+FIELDS[b.n].numeral+'</span> '+FIELDS[b.n].name+'</td><td class="num b-host">'+hostBid+'</td><td class="num b-chal">'+chalBid+'</td><td class="w-'+b.winner+'">'+roleName(b.winner)+(b.winner===side?' (you)':'')+'</td><td>'+(b.tie?'Tie-break ('+(b.rule==='credits'?'more credits left':'battle order')+')':'Higher bid')+'</td></tr>';
-    }).join('');
-    $('#ledgerWrap').innerHTML='<table><thead><tr><th>Battlefield</th><th class="num">Host bid</th><th class="num">Challenger bid</th><th>Winner</th><th>Decided by</th></tr></thead><tbody>'+rows+'</tbody></table>';
-  }
   function renderLobby() {
     renderJoinNote();
     let html='';
@@ -1175,7 +1155,7 @@ async function commitBid() {
     }
     await joinMatch(j.id);
   }
-  function renderAll() { for(let i=0;i<5;i++)renderCard(i);renderHud();renderLedger();renderLobby(); }
+  function renderAll() { for(let i=0;i<5;i++)renderCard(i);renderHud();renderLobby(); }
   async function init() {
     $('#heroArt').innerHTML=window.FD_ART.hero();buildBoard();renderProtocol();renderWallet();renderAll();
     $('#walletBtn').addEventListener('click',()=>{if(state.address&&state.chainId===CHAIN_ID)disconnectWallet();else connectWallet().catch(e=>toast(readError(e),true));});
