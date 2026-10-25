@@ -256,7 +256,6 @@ tr:last-child td { border-bottom: 0; }
 
 /* ---------- lobby ---------- */
 .lobby-list { display: grid; gap: 10px; }
-#myMatchesList:not(:empty) { margin-bottom: 10px; }
 .match-row { display: grid; grid-template-columns: 90px 1fr auto auto; align-items: center; gap: 16px; padding: 14px 18px; background: var(--lacquer); border: 1px solid var(--line); border-left: 3px solid var(--host); }
 .match-row .mid { font-family: var(--serif); font-weight: 800; color: var(--gold-hi); }
 .match-row .who { display: grid; }
@@ -360,28 +359,26 @@ tr:last-child td { border-bottom: 0; }
 
 
 /* play bar: join the latest game, or set a stake and create one */
-.play-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin: 0 0 20px; padding: 18px 20px; background: linear-gradient(120deg, #15110a, #0d0b0d 70%); border: 1px solid var(--line-strong); }
-.play-join { display: grid; gap: 8px; justify-items: start; }
+.play-bar { display: grid; gap: 0; width: min(640px, 100%); margin: 0 auto 20px; background: linear-gradient(120deg, #15110a, #0d0b0d 70%); border: 1px solid var(--line-strong); }
+.play-row { display: grid; gap: 10px; padding: 18px 20px; border-top: 1px solid var(--line); }
+.play-row:first-child { border-top: 0; }
+.play-label { margin: 0; font-family: var(--serif); font-size: 1.05rem; letter-spacing: .06em; color: var(--gold-hi); }
+.play-create-line { display: flex; align-items: flex-end; gap: 10px; }
+.play-create-line .stake-field { flex: 1; }
+.play-create-line .stake-input-wrap { width: 100%; }
+.play-create-line .btn-gold { padding: 11px 22px; white-space: nowrap; }
+.play-join { justify-items: stretch; }
 .play-cta { cursor: pointer; padding: 14px 40px; border: 1px solid var(--gold); border-radius: 2px; font-weight: 700; font-size: 1.05rem; letter-spacing: .03em; background: linear-gradient(#f3d27a, #c08a2a); color: #190f02; }
 .play-cta:hover:not(:disabled) { filter: brightness(1.1); }
 .play-cta:disabled, .play-bar .btn-gold:disabled, .play-bar .btn-line:disabled { opacity: .55; cursor: wait; }
-.play-join-note { margin: 0; max-width: 30ch; font-size: .85rem; color: var(--muted); }
-.play-or { font-family: var(--serif); color: var(--gold); }
-.play-create { display: flex; align-items: flex-end; gap: 10px; }
-.play-create .btn-gold, .play-refresh { padding: 11px 22px; }
-.play-create .stake-input-wrap { width: 150px; }
-.play-refresh { margin-left: auto; align-self: center; }
-.play-fine { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .82rem; }
-@media (max-width: 700px) {
-  .play-bar { flex-direction: column; align-items: stretch; padding: 16px; gap: 12px; }
-  .play-join { justify-items: stretch; }
-  .play-cta { width: 100%; }
-  .play-or { text-align: center; }
-  .play-create { justify-content: space-between; }
-  .play-create .stake-field { flex: 1; }
-  .play-create .stake-input-wrap { width: 100%; }
-  .play-refresh { margin-left: 0; align-self: stretch; }
-}
+.play-join-note { margin: 0; font-size: .85rem; color: var(--muted); }
+.prev-line { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.prev-line select { flex: 1; min-width: 160px; }
+.prev-count, .prev-empty { font-size: .85rem; color: var(--muted); }
+.play-foot { display: grid; gap: 10px; padding: 16px 20px 18px; border-top: 1px solid var(--line); }
+.play-refresh { padding: 11px 22px; width: 100%; }
+.play-fine { margin: 0; color: var(--muted); font-size: .82rem; }
+@media (max-width: 560px) { .play-row { padding: 16px; } .play-foot { padding: 14px 16px 16px; } .play-cta { width: 100%; } }
 </style>
 </head>
 <body>
@@ -448,22 +445,30 @@ tr:last-child td { border-bottom: 0; }
       <h2 id="lobbyTitle"><span lang="ja">陣営</span> Open matches</h2>
     </div>
     <div class="play-bar" id="playBar">
-      <div class="play-join">
+      <div class="play-row play-create" id="createMatchPanel">
+        <h3 class="play-label">Create game</h3>
+        <div class="play-create-line">
+          <label class="stake-field" for="stakeAmount">
+            <span>Stake per player</span>
+            <div class="stake-input-wrap"><span class="currency">USDC</span><input id="stakeAmount" type="number" inputmode="decimal" min="0.000001" max="1000000" step="0.01" value="1" placeholder="1.00"></div>
+          </label>
+          <button type="button" class="btn-gold" id="confirmCreateMatchBtn">Create match</button>
+        </div>
+      </div>
+      <div class="play-row play-join">
+        <h3 class="play-label">Join game</h3>
         <button type="button" class="play-cta" id="joinGameBtn">Join Game</button>
         <p class="play-join-note" id="joinGameNote" aria-live="polite">Checking for open games…</p>
       </div>
-      <span class="play-or" aria-hidden="true">or</span>
-      <div class="play-create" id="createMatchPanel">
-        <label class="stake-field" for="stakeAmount">
-          <span>Stake per player</span>
-          <div class="stake-input-wrap"><span class="currency">USDC</span><input id="stakeAmount" type="number" inputmode="decimal" min="0.000001" max="1000000" step="0.01" value="1" placeholder="1.00"></div>
-        </label>
-        <button type="button" class="btn-gold" id="confirmCreateMatchBtn">Create match</button>
+      <div class="play-row play-prev">
+        <h3 class="play-label">Previous games</h3>
+        <div id="myMatchesList"></div>
       </div>
-      <button type="button" class="btn-line play-refresh" id="refreshBtn" title="Reload open games and the selected match from Base">Refresh</button>
-      <p class="play-fine">Stakes are real USDC on Base. You approve USDC, then confirm each transaction in your wallet. The winner receives both stakes, and a cancelled match is refunded.</p>
+      <div class="play-foot">
+        <button type="button" class="btn-line play-refresh" id="refreshBtn" title="Reload open games and the selected match from Base">Refresh</button>
+        <p class="play-fine">Stakes are real USDC on Base. You approve USDC, then confirm each transaction in your wallet. The winner receives both stakes, and a cancelled match is refunded.</p>
+      </div>
     </div>
-    <div class="lobby-list" id="myMatchesList"></div>
     <div class="lobby-list" id="lobbyList"></div>
   </section>
 
@@ -1174,7 +1179,8 @@ async function commitBid() {
   function renderLobby() {
     renderJoinNote();
     let html='', mine='';
-    if(state.address&&state.myMatches.length){mine+='<div class="match-row yours"><span class="mid">Your matches</span><span class="who"><span>Recent on-chain matches</span><span>'+state.myMatches.length+' loaded</span></span><span class="meta">Wallet history</span><select id="myMatchSelect" aria-label="Select one of your matches"><option value="">Select match…</option>'+state.myMatches.map(id=>'<option value="'+id+'" '+(state.matchId!==null&&BigInt(state.matchId)===id?'selected':'')+'>Match #'+id+'</option>').join('')+'</select></div>';}
+    if(state.address&&state.myMatches.length){mine='<div class="prev-line"><select id="myMatchSelect" aria-label="Select one of your previous games"><option value="">Select match…</option>'+state.myMatches.map(id=>'<option value="'+id+'" '+(state.matchId!==null&&BigInt(state.matchId)===id?'selected':'')+'>Match #'+id+'</option>').join('')+'</select><span class="prev-count">'+state.myMatches.length+' loaded</span></div>';}
+    else mine='<p class="prev-empty">'+(state.address?'No previous games found for this wallet.':'Connect your wallet to see your previous games.')+'</p>';
     if(!state.lobby.length) html+='<div class="empty">No open matches found in the recent on-chain match range. Create one to start a real match.</div>';
     state.lobby.forEach(({id,match:m})=>{const own=state.address&&m.players[0].toLowerCase()===state.address.toLowerCase();html+='<div class="match-row"><span class="mid">#'+id+'</span><span class="who"><span>Host '+short(m.players[0])+'</span><span>Stake '+esc(formatUSDC(m.stake))+' per player</span></span><span class="meta">100 credits each</span><span class="lobby-actions"><button type="button" class="btn-line" data-view="'+id+'">View</button>'+(own?'<button type="button" class="btn-line" data-cancel="'+id+'">Cancel</button>':state.address?'<button type="button" class="btn-gold" data-join="'+id+'">Join match</button>':'<button type="button" class="btn-line" data-view="'+id+'">Connect to join</button>')+'</span></div>';});
     $('#myMatchesList').innerHTML=mine;
